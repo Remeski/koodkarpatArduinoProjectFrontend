@@ -3,7 +3,7 @@ import styles from './NavbarMenu.module.css'
 import React from 'react'
 import NavbarLinks from './NavbarLinks/NavbarLinks'
 
-const NavbarMenu = ({ menuRef, closeMenu, isOpen }) => {
+const NavbarMenu = ({ menuRef, pages, closeMenu, isOpen }) => {
   const classes = [styles.NavbarMenu]
 
   if (isOpen) {
@@ -12,7 +12,7 @@ const NavbarMenu = ({ menuRef, closeMenu, isOpen }) => {
 
   return (
     <div ref={menuRef} className={classes.join(' ')}>
-      <NavbarLinks closeMenu={closeMenu} />
+      <NavbarLinks links={pages} closeMenu={closeMenu} />
     </div>
   )
 }

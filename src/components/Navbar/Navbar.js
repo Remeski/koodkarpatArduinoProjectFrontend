@@ -4,7 +4,7 @@ import styles from './Navbar.module.css'
 import NavbarMenu from './NavbarMenu/NavbarMenu'
 import Hamburger from './Hamburger/Hamburger'
 
-const Navbar = () => {
+const Navbar = ({ pages }) => {
   const [isMenuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
   const navRef = useRef(null)
@@ -42,7 +42,12 @@ const Navbar = () => {
         </div>
         <Hamburger clicked={toggleMenu} open={isMenuOpen} />
       </nav>
-      <NavbarMenu menuRef={menuRef} isOpen={isMenuOpen} closeMenu={closeMenu} />
+      <NavbarMenu
+        menuRef={menuRef}
+        pages={pages}
+        isOpen={isMenuOpen}
+        closeMenu={closeMenu}
+      />
     </>
   )
 }

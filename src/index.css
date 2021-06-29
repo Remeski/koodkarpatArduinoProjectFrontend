@@ -16,3 +16,23 @@ body {
   font-family: 'Play', sans-serif;
   color: var(--text_color);
 }
+
+.recharts-wrapper {
+  position: static !important;
+}
+
+.rcp-saturation {
+  position: static;
+}
+
+.rcp-saturation-cursor {
+  position: relative;
+}
+
+.rcp-hue {
+  position: static;
+}
+
+.rcp-hue-cursor {
+  position: relative;
+}

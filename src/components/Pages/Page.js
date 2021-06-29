@@ -6,7 +6,7 @@ const Page = ({ header, children }) => {
   return (
     <div className={styles.page}>
       <div className={styles.pageContent}>
-        <div className={styles.header}>{header}</div>
+        {header ? <div className={styles.header}>{header}</div> : null}
         <div className={styles.content}>{children}</div>
       </div>
     </div>

@@ -7,14 +7,16 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
   Line,
 } from 'recharts'
 
-import Page from '../Page'
+import Dates from './Dates'
 
 const TemperaturePage = () => {
   const [temperatureData, setTempData] = useState()
+
+  const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
 
   const colors = [
     '#FF6633',
@@ -46,33 +48,56 @@ const TemperaturePage = () => {
 
   useEffect(() => {
     axios
-      //.get('http://koodikarpatarduino.herokuapp.com/temperature')
-      .get('http://localhost:5000/temperature')
+      .get('http://koodikarpatarduino.herokuapp.com/temperature')
+      //.get('http://localhost:5000'.concat('/temperature'))
       .then(res => {
         setTempData(res.data)
       })
   }, [])
 
+  useEffect(() => {
+    if (temperatureData !== undefined) {
+      const startIndex = temperatureData.data.findIndex(elem => {
+        const elemDate = new Date(elem.date)
+        return (
+          elemDate.getFullYear() === startDate.getFullYear() &&
+          elemDate.getMonth() === startDate.getMonth() &&
+          elemDate.getDay() === startDate.getDay()
+        )
+      })
+
+      console.log(startIndex)
+      console.log(temperatureData.data.slice(startIndex))
+    }
+  }, [startDate, endDate, temperatureData])
+
+  const handleStart = newDate => {
+    setStartDate(newDate)
+  }
+
+  const handleEnd = newDate => {
+    setEndDate(newDate)
+  }
+
   return (
-    <Page header='Temperature'>
+    <>
       {temperatureData ? (
         <ResponsiveContainer>
           <LineChart
-            width={1500}
-            height={500}
+            width={0}
+            height={0}
             data={temperatureData.data}
             stroke='#ccc'>
             <CartesianGrid stroke='#ccc' strokeDashArray='4 1 2' />
             <XAxis dataKey='date' stroke='#fff' />
             <YAxis unit='°C' domain={['dataMin', 'dataMax']} stroke='#fff' />
             <Tooltip />
-            <Legend />
             {temperatureData.allsensors.map((elem, id) => (
               <Line
                 key={id}
                 type='monotone'
                 dataKey={elem}
-                stroke={colors[Math.floor(Math.random() * colors.length)]}
+                stroke={colors[id]}
                 dot={false}
               />
             ))}
@@ -81,7 +106,13 @@ const TemperaturePage = () => {
       ) : (
         <p>Loading...</p>
       )}
-    </Page>
+      {/*<Dates
+        startDate={startDate}
+        endDate={endDate}
+        handleStart={handleStart}
+        handleEnd={handleEnd}
+      />*/}
+    </>
   )
 }
 

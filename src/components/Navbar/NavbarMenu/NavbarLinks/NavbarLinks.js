@@ -3,17 +3,13 @@ import NavbarLink from './NavbarLink.js/NavbarLink'
 
 import React from 'react'
 
-const NavbarLinks = ({ closeMenu }) => {
-  return (
-    <div className={styles.NavbarLinks}>
-      <NavbarLink closeMenu={closeMenu} path='/temperature'>
-        Temperature
-      </NavbarLink>
-      <NavbarLink closeMenu={closeMenu} path='/config'>
-        Config
-      </NavbarLink>
-    </div>
-  )
+const NavbarLinks = ({ links, closeMenu }) => {
+  const renderLinks = links.map(link => (
+    <NavbarLink key={link.path} closeMenu={closeMenu} path={link.path}>
+      {link.name}
+    </NavbarLink>
+  ))
+  return <div className={styles.NavbarLinks}>{renderLinks}</div>
 }
 
 export default NavbarLinks
