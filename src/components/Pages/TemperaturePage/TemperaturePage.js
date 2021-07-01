@@ -40,14 +40,14 @@ const TemperaturePage = () => {
     axios
       //.get('http://koodikarpatarduino.herokuapp.com/temperature')
       .get(
-        'http://localhost:5000/temperature/'.concat(
+        'https://koodikarpatarduino.herokuapp.com/temperature/'.concat(
           `${formatDate(startDate)}/${formatDate(endDate)}`
         )
       )
       .then(res => {
         console.log(res.data)
         if (res.data.data.length < 1) {
-          setAlert('No data found')
+          setAlert('No data found. Try selecting different dates.')
           return
         }
         if (res.data.msg) {

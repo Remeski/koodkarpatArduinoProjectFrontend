@@ -31,15 +31,19 @@ const App = () => {
     <div className={styles.bg}>
       <div className={styles.glassPane}>
         <Router>
-          <Navbar pages={pages} />
+          <Navbar homepage='/' pages={pages} />
           <Switch>
-            {/*<Redirect exact from='/' to='/temperature' />
-            <Route path='/temperature'>
-              <TemperaturePage />
+            <Route path='/' exact>
+              <h3>
+                Hello, this is a very awesome frontend. Yes, but please dont
+                come here with a mobile phone (or resize the screen). It dont
+                work, okay?
+              </h3>
+              <p>
+                Just go take a look at the weather or the temperature to be more
+                precise.
+              </p>
             </Route>
-            <Route path='/message'>
-              <MessagePage />
-  </Route>*/}
             {renderPages}
           </Switch>
         </Router>

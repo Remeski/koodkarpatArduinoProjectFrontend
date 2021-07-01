@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useHistory, withRouter } from 'react-router'
 
 import styles from './Navbar.module.css'
 import NavbarMenu from './NavbarMenu/NavbarMenu'
 import Hamburger from './Hamburger/Hamburger'
 
 const Navbar = ({ pages }) => {
+  const history = useHistory()
+
   const [isMenuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef(null)
   const navRef = useRef(null)
@@ -36,7 +39,7 @@ const Navbar = ({ pages }) => {
   return (
     <>
       <nav ref={navRef} className={styles.nav}>
-        <div className={styles.name}>
+        <div className={styles.name} onClick={() => history.push('/')}>
           Some<span className={styles.dash}>-</span>cool
           <span className={styles.dash}>-</span>name
         </div>
@@ -52,4 +55,4 @@ const Navbar = ({ pages }) => {
   )
 }
 
-export default Navbar
+export default withRouter(Navbar)

@@ -47,7 +47,10 @@ const MessagePage = () => {
     e.preventDefault()
     setIsLoading(true)
     axios
-      .post('http://localhost:5000/messagedisplay', { text, size })
+      .post('https://koodikarpatarduino.herokuapp.com/messagedisplay', {
+        text,
+        size,
+      })
       .then(res => {
         setIsLoading(false)
         if (res.status === 201) {
