@@ -10,66 +10,53 @@ import {
   Line,
 } from 'recharts'
 
+import styles from './TemperaturePage.module.css'
+import '../styles.css'
+
 import Dates from './Dates'
+import Alert from '../../UI/Alert/Alert'
 
 const TemperaturePage = () => {
   const [temperatureData, setTempData] = useState()
+  const [isLoading, setIsLoading] = useState(true)
 
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
 
-  const colors = [
-    '#FF6633',
-    '#FFB399',
-    '#FFFF99',
-    '#99FF99',
-    '#E6331A',
-    '#33FFCC',
-    '#991AFF',
-    '#33991A',
-    '#CC9999',
-    '#B3B31A',
-    '#00E680',
-    '#4D8066',
-    '#E6FF80',
-    '#1AFF33',
-    '#999933',
-    '#FF3380',
-    '#CCCC00',
-    '#66E64D',
-    '#4D80CC',
-    '#9900B3',
-    '#E64D66',
-    '#4DB380',
-    '#FF4D4D',
-    '#99E6E6',
-    '#6666FF',
-  ]
+  const [alert, setAlert] = useState()
+
+  const lineColor = '#404040'
 
   useEffect(() => {
-    axios
-      .get('http://koodikarpatarduino.herokuapp.com/temperature')
-      //.get('http://localhost:5000'.concat('/temperature'))
-      .then(res => {
-        setTempData(res.data)
-      })
-  }, [])
-
-  useEffect(() => {
-    if (temperatureData !== undefined) {
-      const startIndex = temperatureData.data.findIndex(elem => {
-        const elemDate = new Date(elem.date)
-        return (
-          elemDate.getFullYear() === startDate.getFullYear() &&
-          elemDate.getMonth() === startDate.getMonth() &&
-          elemDate.getDay() === startDate.getDay()
-        )
-      })
-
-      console.log(startIndex)
-      console.log(temperatureData.data.slice(startIndex))
+    setIsLoading(true)
+    const formatDate = date => {
+      return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
     }
-  }, [startDate, endDate, temperatureData])
+    if (startDate > endDate) {
+      setAlert('Invalid dates selected')
+      setIsLoading(false)
+      return
+    }
+    axios
+      //.get('http://koodikarpatarduino.herokuapp.com/temperature')
+      .get(
+        'http://localhost:5000/temperature/'.concat(
+          `${formatDate(startDate)}/${formatDate(endDate)}`
+        )
+      )
+      .then(res => {
+        console.log(res.data)
+        if (res.data.data.length < 1) {
+          setAlert('No data found')
+          return
+        }
+        if (res.data.msg) {
+          setAlert(res.data.msg)
+        }
+        setTempData(res.data)
+        setIsLoading(false)
+      })
+  }, [startDate, endDate])
 
   const handleStart = newDate => {
     setStartDate(newDate)
@@ -79,39 +66,69 @@ const TemperaturePage = () => {
     setEndDate(newDate)
   }
 
+  const clearAlert = () => {
+    setAlert()
+  }
+
   return (
     <>
-      {temperatureData ? (
-        <ResponsiveContainer>
-          <LineChart
-            width={0}
-            height={0}
-            data={temperatureData.data}
-            stroke='#ccc'>
-            <CartesianGrid stroke='#ccc' strokeDashArray='4 1 2' />
-            <XAxis dataKey='date' stroke='#fff' />
-            <YAxis unit='°C' domain={['dataMin', 'dataMax']} stroke='#fff' />
-            <Tooltip />
-            {temperatureData.allsensors.map((elem, id) => (
-              <Line
-                key={id}
-                type='monotone'
-                dataKey={elem}
-                stroke={colors[id]}
-                dot={false}
+      <div className={styles.alert}>
+        <Alert duration={6000} alert={alert} clearAlert={clearAlert} />
+      </div>
+      <div className='page'>
+        <div className='pageContent'>
+          <div className='headers'>
+            <div className='header'>Temperature</div>
+            <div className={`header ${styles.dates}`}>
+              <Dates
+                startDate={startDate}
+                endDate={endDate}
+                handleStart={handleStart}
+                handleEnd={handleEnd}
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      ) : (
-        <p>Loading...</p>
-      )}
-      {/*<Dates
-        startDate={startDate}
-        endDate={endDate}
-        handleStart={handleStart}
-        handleEnd={handleEnd}
-      />*/}
+            </div>
+          </div>
+          <div className='content'>
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : (
+              <ResponsiveContainer>
+                <LineChart
+                  width={0}
+                  height={0}
+                  data={temperatureData.data}
+                  stroke='#ccc'>
+                  <CartesianGrid stroke='#ccc' strokeDashArray='4 1 2' />
+                  <XAxis
+                    dataKey='date'
+                    stroke='#fff'
+                    tickFormatter={dateTime => {
+                      const date = new Date(dateTime)
+                      return `${date.getDate()}-${date.getMonth() + 1}`
+                    }}
+                  />
+                  <YAxis
+                    unit='°C'
+                    domain={['dataMin', 'dataMax']}
+                    stroke='#fff'
+                  />
+                  <Tooltip />
+                  {temperatureData.allsensors.map((elem, id) => (
+                    <Line
+                      key={id}
+                      type='monotone'
+                      dataKey={elem}
+                      stroke={lineColor}
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+      </div>
     </>
   )
 }

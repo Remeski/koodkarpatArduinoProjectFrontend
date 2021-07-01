@@ -1,24 +1,28 @@
 import React, { useState } from 'react'
+import axios from 'axios'
+
+import Alert from '../../UI/Alert/Alert'
 
 import styles from './MessagePage.module.css'
 
-import { ColorPicker, useColor } from 'react-color-palette'
-import 'react-color-palette/lib/css/styles.css'
+import '../styles.css'
 
 const MessagePage = () => {
   const [text, setText] = useState('')
-  const [prevTextLength, setPrevTextLength] = useState(0)
+  //const [prevTextLength, setPrevTextLength] = useState(0)
+  const [size, setSize] = useState('1')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const [color, setColor] = useColor('hex', '#121212')
+  const [alert, setAlert] = useState()
 
-  const handleSetText = text => {
+  /* const handleSetText = text => {
     setPrevTextLength(text.length)
     setText(text)
-  }
+  } */
 
   const textChange = e => {
     const text = e.target.value
-    const textLength = text.length
+    /* const textLength = text.length
     if (textLength > 4 && textLength <= 7) {
       if (textLength - prevTextLength < 1) {
         const newText = text.slice(0, 5)
@@ -29,41 +33,76 @@ const MessagePage = () => {
       }
     } else if (textLength <= 13) {
       handleSetText(text)
+     */
+    if (text.length <= 7) {
+      setText(text)
     }
+  }
+
+  const sizeChange = e => {
+    setSize(e.target.value)
   }
 
   const send = e => {
     e.preventDefault()
-    console.log(text, color.hex)
+    setIsLoading(true)
+    axios
+      .post('http://localhost:5000/messagedisplay', { text, size })
+      .then(res => {
+        setIsLoading(false)
+        if (res.status === 201) {
+          setText('')
+          setSize(1)
+          setAlert('Message was sent')
+          return
+        }
+        setAlert('Something went wrong')
+      })
+  }
+
+  const clearAlert = () => {
+    setAlert()
   }
 
   return (
     <div className={styles.mainContainer}>
+      <div className={styles.alert}>
+        <Alert clearAlert={clearAlert} alert={alert} duration={7000} />
+      </div>
       <form className={styles.form}>
         <label className={styles.messageLabel}>
           Send a new message to display:
         </label>
-        <div className={styles.messageField}>
-          <input
-            type='text'
-            id='message'
-            onChange={textChange}
-            value={text}
-            placeholder='Your message (two rows with five characters)'
-          />
-          <ColorPicker
-            width={500}
-            height={228}
-            color={color}
-            onChange={setColor}
-            hideHSV
-            hideRGB
-            dark
-          />
-          <button onClick={send} type='submit'>
-            Send
-          </button>
-        </div>
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <div className={styles.messageField}>
+            <div className={styles.input}>
+              <input
+                type='text'
+                id='message'
+                onChange={textChange}
+                value={text}
+                placeholder='Your message (maximum of 7 characters)'
+              />
+              <div className={styles.size}>
+                <label className={styles.sizeLabel}>Size:</label>
+                <select
+                  onChange={sizeChange}
+                  id='size'
+                  name='size'
+                  value={size}>
+                  <option value='1'>1</option>
+                  <option value='2'>2</option>
+                  <option value='3'>3</option>
+                </select>
+              </div>
+            </div>
+            <button onClick={send} type='submit'>
+              Send
+            </button>
+          </div>
+        )}
       </form>
     </div>
   )
