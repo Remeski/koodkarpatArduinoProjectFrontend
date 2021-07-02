@@ -9,20 +9,21 @@ import '../styles.css'
 
 const MessagePage = () => {
   const [text, setText] = useState('')
-  //const [prevTextLength, setPrevTextLength] = useState(0)
-  const [size, setSize] = useState('1')
+  const [prevTextLength, setPrevTextLength] = useState(0)
+  const [color, setColor] = useState('#ffffff')
+
   const [isLoading, setIsLoading] = useState(false)
 
   const [alert, setAlert] = useState()
 
-  /* const handleSetText = text => {
+  const handleSetText = text => {
     setPrevTextLength(text.length)
     setText(text)
-  } */
+  }
 
   const textChange = e => {
     const text = e.target.value
-    /* const textLength = text.length
+    const textLength = text.length
     if (textLength > 4 && textLength <= 7) {
       if (textLength - prevTextLength < 1) {
         const newText = text.slice(0, 5)
@@ -33,32 +34,33 @@ const MessagePage = () => {
       }
     } else if (textLength <= 13) {
       handleSetText(text)
-     */
-    if (text.length <= 7) {
-      setText(text)
     }
-  }
-
-  const sizeChange = e => {
-    setSize(e.target.value)
   }
 
   const send = e => {
     e.preventDefault()
     setIsLoading(true)
+
+    const rows = text.split(' - ')
+
     axios
       .post('https://koodikarpatarduino.herokuapp.com/messagedisplay', {
-        text,
-        size,
+        row1: rows[0],
+        row2: rows[1],
+        colour: color,
       })
       .then(res => {
         setIsLoading(false)
         if (res.status === 201) {
           setText('')
-          setSize(1)
           setAlert('Message was sent')
           return
         }
+        setAlert('Something went wrong')
+      })
+      .catch(err => {
+        setIsLoading(false)
+        setText('')
         setAlert('Something went wrong')
       })
   }
@@ -86,19 +88,15 @@ const MessagePage = () => {
                 id='message'
                 onChange={textChange}
                 value={text}
-                placeholder='Your message (maximum of 7 characters)'
+                placeholder='Your message (two rows of five characters)'
               />
-              <div className={styles.size}>
-                <label className={styles.sizeLabel}>Size:</label>
-                <select
-                  onChange={sizeChange}
-                  id='size'
-                  name='size'
-                  value={size}>
-                  <option value='1'>1</option>
-                  <option value='2'>2</option>
-                  <option value='3'>3</option>
-                </select>
+
+              <div className={styles.color}>
+                <label className={styles.colorLabel}>Color:</label>
+                <input
+                  type='color'
+                  value={color}
+                  onChange={e => setColor(e.target.value)}></input>
               </div>
             </div>
             <button onClick={send} type='submit'>
