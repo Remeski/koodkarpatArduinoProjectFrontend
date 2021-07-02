@@ -19,6 +19,7 @@ import Alert from '../../UI/Alert/Alert'
 const TemperaturePage = () => {
   const [temperatureData, setTempData] = useState()
   const [isLoading, setIsLoading] = useState(true)
+  const [loadingMsg, setLoadingMsg] = useState('Loading...')
 
   const [startDate, setStartDate] = useState(new Date())
   const [endDate, setEndDate] = useState(new Date())
@@ -48,6 +49,7 @@ const TemperaturePage = () => {
         console.log(res.data)
         if (res.data.data.length < 1) {
           setAlert('No data found. Try selecting different dates.')
+          setLoadingMsg('No data')
           return
         }
         if (res.data.msg) {
@@ -90,7 +92,7 @@ const TemperaturePage = () => {
           </div>
           <div className='content'>
             {isLoading ? (
-              <p>Loading...</p>
+              <p>{loadingMsg}</p>
             ) : (
               <ResponsiveContainer>
                 <LineChart
